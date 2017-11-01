@@ -1,8 +1,13 @@
+// =============================================
+// App example 1
+// =============================================
+
 // const express = require("express");
 // const session = require("express-session");
 // const config = require("./config.js");
 //
 // const createInitialSession = require(`./session.js`);
+//
 // const app = express();
 //
 // app.use(
@@ -16,7 +21,7 @@
 //
 // app.use((req, res, next) => createInitialSession(req, res, next));
 //
-// app.get("/", function(req, res) {
+// app.get("/", (req, res) => {
 // 	console.log(req);
 // 	if (req.session.page_views) {
 // 		req.session.page_views++;
@@ -28,17 +33,19 @@
 // });
 //
 // const port = 3000;
-// app.listen(port, function() {
+// app.listen(port, () => {
 // 	console.log("Listening on port", port);
 // });
 
+// =============================================
+// App example 2
 // =============================================
 
 const express = require("express");
 const session = require("express-session");
 const bodyParser = require("body-parser");
 const config = require("./config.js");
-const createInitialSession = require(`./session.js`);
+const checkForSession = require(`./session.js`);
 
 const app = express();
 
@@ -57,10 +64,9 @@ app.use(
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use((req, res, next) => createInitialSession(req, res, next));
+app.use(checkForSession);
 
-app.get("/", function(req, res) {
-	console.log(req.session);
+app.get("/", (req, res) => {
 	if (req.session.email) {
 		res.redirect("/admin");
 	} else {
@@ -68,14 +74,12 @@ app.get("/", function(req, res) {
 	}
 });
 
-app.post("/login", function(req, res) {
-	console.log(req.session);
+app.post("/login", (req, res) => {
 	req.session.email = req.body.email;
 	res.end("done");
 });
 
-app.get("/admin", function(req, res) {
-	console.log(req.session);
+app.get("/admin", (req, res) => {
 	if (req.session.email) {
 		res.write("<h1>Hello " + req.session.email + "</h1><br>");
 		res.end("<a href=" + "/logout" + ">Logout</a>");
@@ -85,9 +89,8 @@ app.get("/admin", function(req, res) {
 	}
 });
 
-app.get("/logout", function(req, res) {
-	req.session.destroy(function(err) {
-		console.log(req.session);
+app.get("/logout", (req, res) => {
+	req.session.destroy(err => {
 		if (err) {
 			console.log(err);
 		} else {
@@ -97,6 +100,6 @@ app.get("/logout", function(req, res) {
 });
 
 const port = 3000;
-app.listen(port, function() {
+app.listen(port, () => {
 	console.log("Listening on port", port);
 });
